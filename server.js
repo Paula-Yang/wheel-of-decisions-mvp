@@ -33,7 +33,7 @@ app.post('/spin', async (req, res) => {
       const { result, options, spin_name } = newSpin;
 
       const savedSpin = await pool.query(
-          "INSERT INTO spins (result, options) VALUES ($1, $2) RETURNING *",
+          "INSERT INTO spins (result, options, spin_name) VALUES ($1, $2, $3) RETURNING *",
           [result, options, spin_name]
       );
 
@@ -91,6 +91,21 @@ app.put('/spin/:id/option/:optionIndex', async (req, res) => {
   }
 });
 
+//delete entire spin
+app.delete('/spin/:spinId', async (req, res) => {
+  console.log(`Attempting to delete spin with ID: ${req.params.spinId}`);
+  const spinId = req.params.spinId;
+
+  try {
+      const result = await pool.query('DELETE FROM spins WHERE id = $1', [spinId]);
+      res.status(200).json({ message: 'Spin deleted successfully!' });
+  } catch(error) {
+      console.error("Error deleting spin:", error);
+      res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+//delete options in spin
 app.delete('/spin/:id/option/:optionIndex', async (req, res) => {
   try {
       const { id, optionIndex } = req.params;

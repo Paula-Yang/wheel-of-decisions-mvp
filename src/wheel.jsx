@@ -42,18 +42,17 @@ export default class Wheel extends React.Component {
             });
         }
     }
+    // handleAddSpinName = () => {
+    //     e.stopPropagation();
+    //     const { currentSpinName } = this.state;
 
-    handleDeleteDecision = (spinId) => {
-        axios.delete(`/spin/${spinId}`)
-            .then(() => {
-                this.setState(prevState => ({
-                    allSpins: prevState.allSpins.filter(spin => spin.id !== spinId)
-                }));
-            })
-            .catch(error => {
-                console.error("Error deleting spin:", error);
-            });
-    }
+    //     if (currentSpinName.trim() !== '') {
+
+    //         this.setState({ currentSpinName: '' });
+    //     } else {
+    //         console.error("Spin name cannot be empty!");
+    //     }
+    // }
 
     handleDeleteOption = (spinId, optionIndex) => {
         axios.delete(`/spin/${spinId}/option/${optionIndex}`)
@@ -72,6 +71,18 @@ export default class Wheel extends React.Component {
         });
     }
 
+    handleDeleteEntireSpin = (spinId) => {
+        axios.delete(`/spin/${spinId}`)
+            .then(() => {
+                this.setState(prevState => ({
+                    allSpins: prevState.allSpins.filter(spin => spin.id !== spinId)
+                }));
+            })
+            .catch(error => {
+                console.error("Error deleting entire spin:", error);
+            });
+    }
+
 
     handleResetOption = () => {
         this.setState({ options: [] });
@@ -79,12 +90,15 @@ export default class Wheel extends React.Component {
 
 
     handleSpin = () => {
+        const { selectedItem, currentSpinName, options } = this.state;
+
+
         if (this.state.selectedItem === null) {
             const selectedItem = Math.floor(Math.random() * this.state.options.length);
             this.setState({ selectedItem });
             const spinResult = this.state.options[selectedItem];
 
-            const newSpin = { name: this.state.currentSpinName, result: spinResult, options: this.state.options };
+            const newSpin = { spin_name: this.state.currentSpinName, result: spinResult, options: this.state.options };
 
 
 
@@ -170,6 +184,7 @@ export default class Wheel extends React.Component {
     }));
     }
 
+
     render() {
         const { options, input, allSpins, selectedItem, excelData } = this.state;
         const spinning = selectedItem !== null ? "spinning" : "";
@@ -186,9 +201,8 @@ export default class Wheel extends React.Component {
                isOpen={this.state.isSidebarOpen}
                allSpins={this.state.allSpins}
                onClickDecision={this.handleDecisionClick}
-               onClickEditDecision= {this.handleEditDecision}
-               onClickDeleteDecision = {this.handleDeleteDecision}
                onClickDeleteOption = {this.handleDeleteOption}
+               onClickDeleteEntireSpin ={this.handleDeleteEntireSpin}
                onOptionEdit={this.handleOptionEdit}
 
             >
@@ -213,11 +227,13 @@ export default class Wheel extends React.Component {
                     </Wrapper>
                     <Wrapper>
                     <div>
+                        <label>Question:</label>
                         <input
                             value={this.state.currentSpinName}
                             onChange={e => this.setState({ currentSpinName: e.target.value })}
                             placeholder="Enter spin name..."
                         />
+                        <label>Add New Option:</label>
                         <input
                             value={input}
                             onChange={e => this.setState({ input: e.target.value })}

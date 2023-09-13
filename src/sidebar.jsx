@@ -61,7 +61,7 @@ class Sidebar extends React.Component {
 
 
     render() {
-        const { isOpen, onClickDecision, onClickEditDecision, onClickDeleteDecision, allSpins, onClickDeleteOption } = this.props;
+        const { isOpen, onClickDecision, onClickEditDecision, onClickDeleteEntireSpin, allSpins, onClickDeleteOption } = this.props;
         //const { allSpins } = this.state;
 
         return (
@@ -91,10 +91,11 @@ class Sidebar extends React.Component {
                                                 </>
                                             )}
                                         </li>
+
                                     ))}
                                 </ul>
                             </div>
-                            {/* <button onClick={() => this.props.onClickEditDecision(spin)}>Edit</button> */}
+                            <button onClick={() => this.props.onClickDeleteEntireSpin(spin.id)}>Delete Spin</button>
 
                         </li>
                     ))}
