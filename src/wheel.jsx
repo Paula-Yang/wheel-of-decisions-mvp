@@ -1,7 +1,10 @@
 import React from "react";
 import axios from 'axios';
 import Sidebar from './sidebar.jsx';
-import { WheelContainer, WheelStyled, WheelItem, SpinButton, Wrapper, GlobalStyles } from './WheelStyles.jsx';
+import { WheelContainer, WheelStyled, WheelItem, SpinButton, Wrapper, GlobalStyles, StyledButton, StyledInput, TopRightButton, InputContainer, Label} from './WheelStyles.jsx';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faList } from '@fortawesome/free-solid-svg-icons';
+import RightSidebar from './RightSidebar.jsx';
 
 
 export default class Wheel extends React.Component {
@@ -15,6 +18,8 @@ export default class Wheel extends React.Component {
             excelData: [],
             isSidebarOpen: false,
             currentSpinName: '',
+            isModalOpen: false
+            //editingDecisionId: null
         };
     }
 
@@ -42,17 +47,7 @@ export default class Wheel extends React.Component {
             });
         }
     }
-    // handleAddSpinName = () => {
-    //     e.stopPropagation();
-    //     const { currentSpinName } = this.state;
 
-    //     if (currentSpinName.trim() !== '') {
-
-    //         this.setState({ currentSpinName: '' });
-    //     } else {
-    //         console.error("Spin name cannot be empty!");
-    //     }
-    // }
 
     handleDeleteOption = (spinId, optionIndex) => {
         axios.delete(`/spin/${spinId}/option/${optionIndex}`)
@@ -84,13 +79,31 @@ export default class Wheel extends React.Component {
     }
 
 
-    handleResetOption = () => {
+    handleResetOption = (e) => {
+        e.stopPropagation();
         this.setState({ options: [] });
     }
 
+    handleEditDecision = (decision) => {
+        this.setState({
+            input: decision.options.join(', '),
+            editingDecisionId: decision.id
+        });
+    }
+
+    handleEditDecisionFromSidebar = (spinId) => {
+
+        const decision = this.state.allSpins.find(spin => spin.id === spinId);
+        if (decision) {
+            //call handleEditDecision method if the decision is using a existed spin id
+            this.handleEditDecision(decision);
+        }
+    }
+
+
 
     handleSpin = () => {
-        const { selectedItem, currentSpinName, options } = this.state;
+        const { selectedItem, currentSpinName, options, editingDecisionId } = this.state;
 
 
         if (this.state.selectedItem === null) {
@@ -100,17 +113,40 @@ export default class Wheel extends React.Component {
 
             const newSpin = { spin_name: this.state.currentSpinName, result: spinResult, options: this.state.options };
 
-
-
-            axios.post('/spin', newSpin)
-                .then(response => {
-                    this.setState({ allSpins: [...this.state.allSpins, response.data],
-                        currentSpinName: ''
+            //make sure it update the existing spin if updated an existing spin history
+            console.log("editingDecisionId: ", editingDecisionId);
+            if(editingDecisionId) {
+                console.log("editingDecisionId exist ", editingDecisionId);
+                //update the existing spin
+                axios.put(`/spin/${editingDecisionId}/result`, newSpin)
+                    .then(response => {
+                        this.setState(prevState => ({
+                            allSpins: prevState.allSpins.map(spin =>
+                                spin.id === editingDecisionId ? response.data : spin
+                            ),
+                            //currentSpinName: '',
+                        }));
+                    })
+                    .catch(error => {
+                        console.error("Error updating spin result:", error);
                     });
-                })
-                .catch(error => {
-                    console.error("Error saving spin result:", error);
-                });
+            } else {
+                console.log("Creating a new spin");
+                //create a new spin if not editing on existing spin
+                axios.post('/spin', newSpin)
+                    .then(response => {
+                        this.setState({
+                            allSpins: [...this.state.allSpins, response.data],
+                            // currentSpinName: '',
+                            //editingDecisionId: null
+                        });
+
+
+                    })
+                    .catch(error => {
+                        console.error("Error saving spin result:", error);
+                    });
+            }
 
             this.setState(state => ({
                 excelData: [...state.excelData, {
@@ -125,12 +161,6 @@ export default class Wheel extends React.Component {
         }
     }
 
-    handleEditDecision = (decision) => {
-        this.setState({
-            input: decision.options.join(', '),
-            editingDecisionId: decision.id
-        });
-    }
 
     updateExistingSpin = (id, newOptions) => {
         axios.put(`/spin/${id}`, {
@@ -142,8 +172,8 @@ export default class Wheel extends React.Component {
                 allSpins: prevState.allSpins.map(spin =>
                     spin.id === id ? response.data : spin
                 ),
-                input: '',
-                editingDecisionId: null
+                input: ''
+                //editingDecisionId: null
             }));
         })
         .catch(error => {
@@ -184,6 +214,10 @@ export default class Wheel extends React.Component {
     }));
     }
 
+    toggleModal = () => {
+        this.setState(prevState => ({ isModalOpen: !prevState.isModalOpen }));
+    }
+
 
     render() {
         const { options, input, allSpins, selectedItem, excelData } = this.state;
@@ -196,7 +230,12 @@ export default class Wheel extends React.Component {
         return (
             <>
             <GlobalStyles />
-            <button onClick={this.toggleSidebar}>ShowHistory</button>
+            <FontAwesomeIcon style= {{
+                cursor: 'pointer',
+                position: 'absolute',
+                top: '10px',
+                right: '10px'
+            }}  icon={faList} size='lg' onClick={this.toggleSidebar}/>
             <Sidebar
                isOpen={this.state.isSidebarOpen}
                allSpins={this.state.allSpins}
@@ -204,11 +243,23 @@ export default class Wheel extends React.Component {
                onClickDeleteOption = {this.handleDeleteOption}
                onClickDeleteEntireSpin ={this.handleDeleteEntireSpin}
                onOptionEdit={this.handleOptionEdit}
+               //onEditDecision={this.handleEditDecision}
+               onStartEditDecision={this.handleEditDecisionFromSidebar}
+               onOpenModal={this.toggleModal}
+            />
 
-            >
+            <RightSidebar
+                    isOpen={this.state.isModalOpen}
+                    input={this.state.input}
+                    onOptionInputChange={value => this.setState({ input: value })}
+                    onAddOption={this.handleAddOption}
+                    onResetOption={this.handleResetOption}
+                    currentSpinName={this.state.currentSpinName}
+                    onSpinNameChange={value => this.setState({ currentSpinName: value })}
+                    onClose={this.toggleModal}
+                />
 
-            </Sidebar>
-            <WheelContainer>
+            <WheelContainer style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
                 <Wrapper>
                     <WheelStyled
                         className={spinning}
@@ -225,26 +276,11 @@ export default class Wheel extends React.Component {
                         ))}
                     </WheelStyled>
                     </Wrapper>
+                    <SpinButton onClick={this.handleSpin}>Spin!</SpinButton>
+                    </WheelContainer>
                     <Wrapper>
-                    <div>
-                        <label>Question:</label>
-                        <input
-                            value={this.state.currentSpinName}
-                            onChange={e => this.setState({ currentSpinName: e.target.value })}
-                            placeholder="Enter spin name..."
-                        />
-                        <label>Add New Option:</label>
-                        <input
-                            value={input}
-                            onChange={e => this.setState({ input: e.target.value })}
-                            placeholder="Enter option..."
-                        />
-                        <button onClick={this.handleAddOption}>Add</button>
-                        <button onClick={this.handleResetOption}>Reset</button>
-                        <SpinButton onClick={this.handleSpin}>Spin!</SpinButton>
-                    </div>
                 </Wrapper>
-            </WheelContainer>
+
             </>
         );
 

@@ -91,6 +91,25 @@ app.put('/spin/:id/option/:optionIndex', async (req, res) => {
   }
 });
 
+//update result of an existing spin
+app.put('/spin/:id/result', async (req, res) => {
+  try {
+      const { id } = req.params;
+      const { result, options, spin_name } = req.body;
+
+      const updatedSpin = await pool.query(
+          "UPDATE spins SET result = $1, options = $2, spin_name = $3 WHERE id = $4 RETURNING *",
+          [result, options, spin_name, id]
+      );
+
+      res.json(updatedSpin.rows[0]);
+  } catch (err) {
+      console.error(err.message);
+      res.status(500).send("Server Error");
+  }
+});
+
+
 //delete entire spin
 app.delete('/spin/:spinId', async (req, res) => {
   console.log(`Attempting to delete spin with ID: ${req.params.spinId}`);

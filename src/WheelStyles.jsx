@@ -1,15 +1,15 @@
 import styled, { createGlobalStyle } from 'styled-components';
 
 
-// Define global styles (similar to :root in CSS)
-export const GlobalStyles = createGlobalStyle`
+
+export  const GlobalStyles = createGlobalStyle`
   :root {
     --wheel-font: 'Arial', sans-serif;
     --wheel-size: 450px;
     --wheel-border-size: 8px;
-    --wheel-color: hsl(212, 85%, 45%);
-    --neutral-color: #f8f8f8;
-    --highlight-color: hsl(42, 90%, 50%);
+    --wheel-color: #0C4160;
+    --neutral-color: #FFFFFF;
+    --highlight-color: #738FA7;
     --PI: 3.14159265358979;
     --nb-item: 0;
     --item-nb: 0;
@@ -21,6 +21,7 @@ export const GlobalStyles = createGlobalStyle`
 `;
 
 export const WheelContainer = styled.div`
+  z-index: 0;
   display: block;
   position: relative;
   box-sizing: content-box;
@@ -96,7 +97,7 @@ export const WheelItem = styled.div`
   width: 50%;
   transform-origin: center left;
   transform: translateY(-50%) rotate(calc(var(--item-nb) * (360deg / var(--nb-item, 1))));
-  color: var(--neutral-color);
+  color: white;
   text-align: right;
   padding: 0 30px 0 55px;
   font-family: var(--wheel-font);
@@ -134,7 +135,7 @@ export const SpinButton = styled.button`
   font-size: 18px;
   cursor: pointer;
   outline: none;
-  color: var(--neutral-color);
+  color: white;
   transition: background-color 0.3s, transform 0.2s;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 
@@ -145,6 +146,79 @@ export const SpinButton = styled.button`
 `;
 
 export const Wrapper = styled.div`
-  padding: 3px;
+  padding: 0px;
   margin: auto;
 `;
+
+export const StyledButton = styled.button`
+  background: linear-gradient(45deg, #C3CEDA 30%, #738FA7 90%);
+  border: 0;
+  border-radius: 3px;
+  color: white;
+  height: 48px;
+  padding: 0 30px;
+  cursor: pointer;
+  transition: background 0.4s;
+  margin-right: 10px;
+
+  &:hover {
+      background: linear-gradient(45deg, #E9EAEC 30%, #FAD02C 90%);
+      color: #90ADC6
+  }
+`;
+
+export const StyledInput = styled.input`
+padding: 10px 15px;
+border: 1px solid #dcdcdc;
+border-radius: 4px;
+font-size: 16px;
+margin-right: 10px;
+transition: border 0.3s;
+
+&:focus {
+    border-color: #FF8E53;
+    outline: none;
+}
+`;
+
+
+export const LayoutWrapper = styled.div`
+padding: 20px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+flex-direction: column;
+
+& > * + * {  // Adds margin between every direct child
+    margin-top: 10px;
+}
+
+label {
+    margin-right: 10px;
+}
+`;
+
+export const TopRightButton = styled(StyledButton)`
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+`;
+
+export const InputContainer = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+`;
+
+export const Label = styled.div`
+  font-family: var(--wheel-font);
+  font-weight: bold;
+  font-size: 18px;
+  color: #0C4160;
+`
