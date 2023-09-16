@@ -4,7 +4,7 @@ import styled, { createGlobalStyle } from 'styled-components';
 
 export  const GlobalStyles = createGlobalStyle`
   :root {
-    --wheel-font: 'Arial', sans-serif;
+    --wheel-font: Luminari, fantasy;
     --wheel-size: 450px;
     --wheel-border-size: 8px;
     --wheel-color: #0C4160;
@@ -18,7 +18,22 @@ export  const GlobalStyles = createGlobalStyle`
     --spinning-duration: 5s;
     --reset-duration: 0.3s;
   }
+
 `;
+
+export const ParentContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  margin: 50px;
+`
+
+export const faListIcon = styled.div`
+  z-index: 1000;
+  position: relative;
+`
 
 export const WheelContainer = styled.div`
   z-index: 0;
@@ -31,6 +46,7 @@ export const WheelContainer = styled.div`
   margin: 2em auto;
   background-color: var(--neutral-color);
   border: solid var(--highlight-color) 3px;
+  // border: soid orange 3px;
   border-radius: 50%;
   user-select: none;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
@@ -61,8 +77,9 @@ export const WheelStyled = styled.div`
   height: var(--wheel-size);
   overflow: hidden;
   border-radius: 50%;
+  // border: solid white;
   border: solid var(--wheel-color) var(--wheel-border-size);
-  background: linear-gradient(45deg, var(--wheel-color), var(--highlight-color));
+  background: linear-gradient(45deg, #0C4160 30%, #738FA7 90%);
   transition: transform var(--reset-duration);
   transform: rotate(0deg);
   cursor: pointer;
@@ -101,6 +118,7 @@ export const WheelItem = styled.div`
   text-align: right;
   padding: 0 30px 0 55px;
   font-family: var(--wheel-font);
+  font-size: 1.4em;
   font-weight: bold;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 
@@ -138,6 +156,7 @@ export const SpinButton = styled.button`
   color: white;
   transition: background-color 0.3s, transform 0.2s;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-family: var(--wheel-font)
 
   &:hover {
     background-color: var(--wheel-color);
@@ -198,12 +217,13 @@ label {
 }
 `;
 
-export const TopRightButton = styled(StyledButton)`
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    z-index: 100;
-`;
+export const Headers = styled.div`
+  font-family: 'Luminari', fantasy;
+  font-weight: bold;
+  font-size: 1.5em;
+  margin-bottom: 20px;
+  font-color: #071330;
+`
 
 export const InputContainer = styled.div`
     display: flex;

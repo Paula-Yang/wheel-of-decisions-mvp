@@ -10,8 +10,8 @@ const StyledSidebar = styled.div`
   z-index: 10;
   position: absolute;
   right: 0;
-  width: 80vw;
-  max-width: 500px;
+  width: 25vw;
+
   height: 100vh;
   background-color: #f1f1f1;
   padding: 20px;
@@ -38,7 +38,7 @@ const StyledSidebar = styled.div`
   }
 
   h2 {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Luminari', fantasy;
     font-weight: bold;
     font-size: 1.5em;
     margin-bottom: 20px;
@@ -46,9 +46,10 @@ const StyledSidebar = styled.div`
   }
 
   ul {
-    font-family: 'Arial', sans-serif;
-    font-size: 1em;
+    font-family: Luminari, fantasy;
+    font-size: 1.1em;
     padding-left: 20px;
+    margin-left: 10px;
 
     li {
       margin-bottom: 15px;
@@ -93,10 +94,10 @@ const OptionWrapper = styled.div`
     align-items: center;
     justify-content: space-between;
     margin-bottom: 10px;
-    padding: 10px 0; // Added vertical padding for each option.
+    padding: 10px 0;
 
     > *:not(:last-child) {
-    margin-right: 15px; // Increased the space between items for better spacing.
+    margin-right: 15px;
     }
 `;
 
@@ -108,12 +109,9 @@ const OptionContainer = styled.div`
     margin-bottom: 10px;
 
     button {
-    margin-left: 10px;  // Add space between buttons and option text.
+    margin-left: 10px;
     }
 `;
-
-
-
 
 
 
@@ -123,10 +121,10 @@ class Sidebar extends React.Component {
         editingSpinId: null,
         tempOptionText: '',
         openSpinId: null
+        // newOptionTexts: {}
     };
 
     handleStartEdit = (spinId, optionIndex, optionText) => {
-        // Inform parent that editing has started for a decision.
         this.props.onStartEditDecision(spinId);
 
         this.setState({
@@ -162,13 +160,23 @@ class Sidebar extends React.Component {
                 <FontAwesomeIcon icon={faPlusCircle} size="lg" onClick={() => this.props.onOpenModal()}/>
                 <h2>Previous Spins</h2>
                 <ul>
-                {allSpins.map(spin => (
+                {allSpins.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)).map(spin => (
                     <Spinbox key={spin.id} onClick={() => onClickDecision(spin)}>
                     <LayoutWrapper onClick={() => this.setState({ openSpinId: this.state.openSpinId === spin.id ? null : spin.id })}>
                         <span>{spin.spin_name}</span>
                         <FontAwesomeIcon style= {{ cursor: 'pointer', size: 'lg'}} icon={faCaretDown} />
                     </LayoutWrapper>
                     <CollapsibleSection className={this.state.openSpinId === spin.id ? "open" : ""}>
+
+                    <OptionWrapper>
+                        <StyledInput
+                            placeholder="Add new option"
+                            value={this.state.newOption}
+                            onChange={(e) => this.setState({ newOption: e.target.value})}
+                        />
+                        <FontAwesomeIcon icon={faPlusCircle} size="lg" onClick={() => this.props.onAddOptionToSpin(spin.id, this.state.newOption)} />
+                    </OptionWrapper>
+
                         <ul>
                         {spin.options.map((option, index) => (
                         <li key={index}>

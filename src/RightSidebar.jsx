@@ -8,8 +8,7 @@ const StyledSidebar = styled.div`
   z-index: 10;
   position: absolute;
   right: 0;
-  width: 80vw;
-  max-width: 500px;
+  width: 25vw;
   height: 100vh;
   background-color: #f1f1f1;
   padding: 20px;
@@ -36,16 +35,24 @@ const StyledSidebar = styled.div`
   }
 
   h2 {
-    font-family: 'Arial', sans-serif;
+    font-family: Luminari, fantasy;
     font-weight: bold;
     font-size: 1.5em;
     margin-bottom: 20px;
     font-color: #071330;
   }
 
+  h3 {
+    font-family: Luminari, fantasy;
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 20px;
+    font-color: #071330;
+  }
+
   ul {
-    font-family: 'Arial', sans-serif;
-    font-size: 1em;
+    font-family: Luminari, fantasy;
+    font-size: 1.1em;
     padding-left: 20px;
 
     li {
@@ -66,26 +73,71 @@ const Spinbox = styled.div`
     }
 `;
 
-const RightSidebarStyled = styled(StyledSidebar)`
-    left: auto;
-    right: 0;
+// const Headers = styled.div`
+//   font-family: 'Luminari', fantasy;
+//   font-weight: bold;
+//   font-size: 1.5em;
+//   margin-bottom: 20px;
+//   font-color: #071330;
+// `
 
-    transform: translateX(100%);
-    &.open {
-        transform: translateX(0);
-    }
-`;
+const RightSidebarButton = styled.div`
+
+  appearance: none;
+  background-color: #FAFBFC;
+  border: 1px solid rgba(27, 31, 35, 0.15);
+  border-radius: 6px;
+  box-shadow: rgba(27, 31, 35, 0.04) 0 1px 0, rgba(255, 255, 255, 0.25) 0 1px 0 inset;
+  box-sizing: border-box;
+  color: #24292E;
+  cursor: pointer;
+  display: inline-block;
+  font-family: Luminari, fantasy;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  list-style: none;
+  padding: 6px 16px;
+  position: relative;
+  transition: background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+  white-space: nowrap;
+  word-wrap: break-word;
+
+
+&:hover {
+  background-color: #F3F4F6;
+  text-decoration: none;
+  transition-duration: 0.1s;
+}
+
+
+.button-4:focus {
+  outline: 1px transparent;
+}
+
+.button-4:before {
+  display: none;
+}
+
+.button-4:-webkit-details-marker {
+  display: none;
+}
+`
 
 function RightSidebar(props) {
     if (!props.isOpen) return null;
 
     return (
-        <RightSidebarStyled className={props.isOpen ? "open" : ""}>
+        <StyledSidebar className={props.isOpen ? "open" : ""}>
             <FontAwesomeIcon icon={faArrowLeft} size="lg" onClick={props.onClose} />
             <h2>Create New</h2>
 
             <Spinbox>
-                <h3>Question:</h3>
+                <h3>Question:</ h3>
                 <StyledInput
                     value={props.currentSpinName}
                     onChange={e => props.onSpinNameChange(e.target.value)}
@@ -103,11 +155,11 @@ function RightSidebar(props) {
             </Spinbox>
 
             <Spinbox style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <button onClick={props.onAddOption}>Add</button>
-                <button onClick={props.onResetOption}>Reset</button>
+                <RightSidebarButton onClick={props.onAddOption}>Add</RightSidebarButton>
+                <RightSidebarButton onClick={props.onResetOption}>Reset</RightSidebarButton>
             </Spinbox>
 
-        </RightSidebarStyled>
+        </StyledSidebar>
     );
 }
 

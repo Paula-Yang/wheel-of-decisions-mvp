@@ -1,7 +1,7 @@
 import React from "react";
 import axios from 'axios';
 import Sidebar from './sidebar.jsx';
-import { WheelContainer, WheelStyled, WheelItem, SpinButton, Wrapper, GlobalStyles, StyledButton, StyledInput, TopRightButton, InputContainer, Label} from './WheelStyles.jsx';
+import { WheelContainer, WheelStyled, WheelItem, SpinButton, Wrapper, GlobalStyles, StyledButton, StyledInput, TopRightButton, InputContainer, Label, ParentContainer, Headers, faListIcon} from './WheelStyles.jsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faList } from '@fortawesome/free-solid-svg-icons';
 import RightSidebar from './RightSidebar.jsx';
@@ -124,7 +124,7 @@ export default class Wheel extends React.Component {
                             allSpins: prevState.allSpins.map(spin =>
                                 spin.id === editingDecisionId ? response.data : spin
                             ),
-                            //currentSpinName: '',
+
                         }));
                     })
                     .catch(error => {
@@ -137,7 +137,7 @@ export default class Wheel extends React.Component {
                     .then(response => {
                         this.setState({
                             allSpins: [...this.state.allSpins, response.data],
-                            // currentSpinName: '',
+                            currentSpinName: '',
                             //editingDecisionId: null
                         });
 
@@ -207,6 +207,30 @@ export default class Wheel extends React.Component {
         });
     }
 
+    handleAddOptionToSpin = (spinId, newOption) => {
+        axios.put(`/spin/${spinId}/option`, { newOption })
+            .then(response => {
+                this.setState(prevState => {
+                    const allSpins = [...prevState.allSpins];
+                    const spin = allSpins.find(s => s.id === spinId);
+                    if (spin) {
+                        //update the options with the new set of options returned from the server
+                        spin.options = response.data.options;
+                    }
+
+                    //upate the wheel
+                    const wheelOptions = [...prevState.options, newOption];
+
+                    return { allSpins, options: wheelOptions, newOption: '' };
+                });
+            })
+            .catch(error => {
+                console.error("Error adding option to spin:", error);
+            });
+    }
+
+
+
     toggleSidebar = () => {
         console.log("Current sidebar state:", this.state.isSidebarOpen);
         this.setState(prevState => ({
@@ -215,7 +239,12 @@ export default class Wheel extends React.Component {
     }
 
     toggleModal = () => {
-        this.setState(prevState => ({ isModalOpen: !prevState.isModalOpen }));
+        this.setState(prevState => ({
+            isModalOpen: !prevState.isModalOpen,
+            input: '',
+            options: [],
+            selectedItem: null
+        }));
     }
 
 
@@ -230,12 +259,16 @@ export default class Wheel extends React.Component {
         return (
             <>
             <GlobalStyles />
+            <ParentContainer>
+            <Headers>Wheel of decision</Headers>
+            <faListIcon>
             <FontAwesomeIcon style= {{
                 cursor: 'pointer',
                 position: 'absolute',
                 top: '10px',
                 right: '10px'
             }}  icon={faList} size='lg' onClick={this.toggleSidebar}/>
+            </faListIcon>
             <Sidebar
                isOpen={this.state.isSidebarOpen}
                allSpins={this.state.allSpins}
@@ -246,6 +279,7 @@ export default class Wheel extends React.Component {
                //onEditDecision={this.handleEditDecision}
                onStartEditDecision={this.handleEditDecisionFromSidebar}
                onOpenModal={this.toggleModal}
+               onAddOptionToSpin={this.handleAddOptionToSpin}
             />
 
             <RightSidebar
@@ -280,7 +314,7 @@ export default class Wheel extends React.Component {
                     </WheelContainer>
                     <Wrapper>
                 </Wrapper>
-
+                </ParentContainer>
             </>
         );
 
